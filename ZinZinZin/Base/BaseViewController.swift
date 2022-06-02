@@ -6,13 +6,16 @@
 //
 
 import UIKit
+import Combine
 
 open class BaseViewController: UIViewController {
-    
+    var bag = Set<AnyCancellable>()
     init() {
         super.init(nibName: nil, bundle: nil)
     }
-    
+    deinit {
+        print(Self.self, #function)
+    }
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -22,4 +25,5 @@ open class BaseViewController: UIViewController {
         
         view.backgroundColor = .white
     }
+    
 }

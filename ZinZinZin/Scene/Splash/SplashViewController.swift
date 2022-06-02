@@ -11,9 +11,23 @@ import Combine
 
 final class SplashViewController: BaseViewController {
     
-    let completedSubject = PassthroughSubject<Bool, Never>()
+    class ViewModel {
+        let completedSubject = PassthroughSubject<Bool, Never>()
+        deinit {
+            print(Self.self, #function)
+        }
+    }
     
-    private var bag = Set<AnyCancellable>()
+    var viewModel: ViewModel!
+    
+    init(viewModel: ViewModel, nibName nibNameOrNil: String? = nil, bundle nibBundleOrNil: Bundle? = nil) {
+        super.init()
+        self.viewModel = viewModel
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView(frame: view.frame)
@@ -22,6 +36,7 @@ final class SplashViewController: BaseViewController {
         imageView.image = UIImage(named: "LizardMan")
         return imageView
     }()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +49,7 @@ final class SplashViewController: BaseViewController {
                                                      animated: false)
         
         nextPage()
-            .subscribe(completedSubject)
+            .subscribe(viewModel.completedSubject)
             .store(in: &bag)
     }
     

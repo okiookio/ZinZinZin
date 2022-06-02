@@ -13,9 +13,11 @@ enum SettingsCoordinationResult {
 }
 
 final class SettingsCoordinator: BaseCoordinator<SettingsCoordinationResult> {
-    
+    private lazy var viewModel: SettingsViewController.ViewModel = {
+        .init()
+    }()
     lazy var viewController: SettingsViewController = {
-        let viewController = SettingsViewController()
+        let viewController = SettingsViewController(viewModel: viewModel)
         return viewController
     }()
     
@@ -26,16 +28,16 @@ final class SettingsCoordinator: BaseCoordinator<SettingsCoordinationResult> {
     
     override func start() -> AnyPublisher<SettingsCoordinationResult, Never> {
         
-        let pushLogoutResult = viewController.pushSubject
+        let pushLogoutResult = viewModel.pushSubject
             .flatMap { _ in
                 self.push(to: SettingsCoordinator(presenting: self.router.navigationController))
             }
             .filter { $0 == .loggedOut }
         
-        let logoutAction = viewController.logoutSubject.map { _ in SettingsCoordinationResult.loggedOut }
+        let logoutAction = viewModel.logoutSubject.map { _ in SettingsCoordinationResult.loggedOut }
             
         
-        viewController.presentSubject
+        viewModel.presentSubject
             .flatMap { [unowned self] _ in
                 self.present(to: ComposeCoordinator(presenting: NavigationController(), tab: .waking))
             }

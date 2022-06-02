@@ -12,8 +12,11 @@ final class ComposeCoordinator: BaseCoordinator<Bool> {
     
     private let tab: Tab
     
+    private lazy var viewModel: ComposeViewController.ViewModel = {
+        .init()
+    }()
     private lazy var viewController: ComposeViewController = {
-        let viewController = ComposeViewController(tab: tab)
+        let viewController = ComposeViewController(tab: tab, viewModel: viewModel)
         return viewController
     }()
     
@@ -33,9 +36,9 @@ final class ComposeCoordinator: BaseCoordinator<Bool> {
     
     override func start() -> AnyPublisher<Bool, Never> {
         
-        let dismiss = viewController.completed
+        let dismiss = viewModel.completed
         
-        let multiplePresentResult = viewController.present
+        let multiplePresentResult = viewModel.present
             .eraseToAnyPublisher()
             .flatMap { _ -> AnyPublisher<Bool, Never> in
                 let coordinator = ComposeCoordinator(presenting: NavigationController(),

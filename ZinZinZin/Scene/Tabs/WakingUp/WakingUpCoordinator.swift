@@ -11,8 +11,11 @@ import Combine
 
 final class WakingUpCoordinator: BaseCoordinator<Void> {
     
+    private lazy var viewModel: WakingUpViewController.ViewModel = {
+        .init()
+    }()
     private lazy var viewController: WakingUpViewController = {
-        let viewController = WakingUpViewController(tab: tab)
+        let viewController = WakingUpViewController(tab: tab, viewModel: viewModel)
         return viewController
     }()
     
@@ -39,7 +42,7 @@ final class WakingUpCoordinator: BaseCoordinator<Void> {
     
     override func start() -> AnyPublisher<Void, Never> {
         
-        viewController.openUrlSubject
+        viewModel.openUrlSubject
             .flatMap { [unowned self] url in
                 self.openUrl(url)
             }.sink(receiveValue: { _ in
@@ -47,7 +50,7 @@ final class WakingUpCoordinator: BaseCoordinator<Void> {
             })
             .store(in: &bag)
         
-        let logoutAction = viewController.settingsSubject
+        let logoutAction = viewModel.settingsSubject
             .flatMap { _ in
                 self.startSettings()
             }.filter { isLogout in

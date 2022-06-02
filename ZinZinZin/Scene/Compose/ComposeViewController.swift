@@ -9,17 +9,22 @@ import UIKit
 import Combine
 
 final class ComposeViewController: BaseViewController {
+    class ViewModel {
+        let completed = PassthroughSubject<Bool, Never>()
+        
+        let present = PassthroughSubject<Void, Never>()
+        deinit {
+            print(Self.self, #function)
+        }
+    }
     
-    let completed = PassthroughSubject<Bool, Never>()
-    
-    let present = PassthroughSubject<Void, Never>()
-    
-    private var bag = Set<AnyCancellable>()
-    
+        
+    private var viewModel: ViewModel!
     private let tab: Tab
     
-    public init(tab: Tab) {
+    public init(tab: Tab, viewModel: ViewModel) {
         self.tab = tab
+        self.viewModel = viewModel
         super.init()
     }
     
@@ -36,7 +41,7 @@ final class ComposeViewController: BaseViewController {
     }()
     
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [label, buttonContainerStackView, presentTestButton])
+        let stackView = UIStackView(arrangedSubviews: [label, buttonContainerStackView, presentTestButton, closeButton])
         stackView.alignment = .center
         stackView.axis = .vertical
         stackView.spacing = 32
@@ -54,7 +59,7 @@ final class ComposeViewController: BaseViewController {
     
     private lazy var okButton: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
-            self.completed.send(true)
+            self.viewModel.completed.send(true)
         }))
         button.contentHorizontalAlignment = .center
         button.setTitle("OK", for: .normal)
@@ -64,7 +69,8 @@ final class ComposeViewController: BaseViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
-            self.completed.send(false)
+//            self.viewModel.completed.send(false)
+            NotificationCenter.default.post(name: Notification.Name("UserLoggedOut"), object: nil)
         }))
         button.contentHorizontalAlignment = .center
         button.setTitle("Cancel", for: .normal)
@@ -72,10 +78,18 @@ final class ComposeViewController: BaseViewController {
         return button
     }()
     
-    
+    private lazy var closeButton: UIButton = {
+        let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
+            self.dismiss(animated: true)
+        }))
+        button.contentHorizontalAlignment = .center
+        button.setTitle("Dissmiss", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 22)
+        return button
+    }()
     private lazy var presentTestButton: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
-            self.present.send(())
+            self.viewModel.present.send(())
         }))
         button.contentHorizontalAlignment = .center
         button.setTitle("Present Test", for: .normal)

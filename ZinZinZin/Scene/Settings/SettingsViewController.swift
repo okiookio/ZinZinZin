@@ -10,14 +10,26 @@ import Combine
 
 final class SettingsViewController: BaseViewController {
     
-    let logoutSubject = PassthroughSubject<Bool, Never>()
+    class ViewModel {
+        let logoutSubject = PassthroughSubject<Bool, Never>()
+        
+        let presentSubject = PassthroughSubject<Void, Never>()
+        
+        let pushSubject = PassthroughSubject<Void, Never>()
+        deinit {
+            print(Self.self, #function)
+        }
+    }
+    private var viewModel: ViewModel!
+    public init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+        super.init()
+    }
     
-    let presentSubject = PassthroughSubject<Void, Never>()
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    let pushSubject = PassthroughSubject<Void, Never>()
-
-    private var bag = Set<AnyCancellable>()
-
     private lazy var stackView: UIStackView = {
        let stackView = UIStackView(arrangedSubviews: [label, logoutButton, presentButton, pushButton])
         stackView.alignment = .center
@@ -37,7 +49,7 @@ final class SettingsViewController: BaseViewController {
 
     private lazy var logoutButton: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
-//            self.logoutSubject.send(true)
+//            self.viewModel.logoutSubject.send(true)
             NotificationCenter.default.post(name: Notification.Name("UserLoggedOut"), object: nil)
         }))
         button.contentHorizontalAlignment = .center
@@ -48,7 +60,7 @@ final class SettingsViewController: BaseViewController {
     
     private lazy var presentButton: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
-            self.presentSubject.send(())
+            self.viewModel.presentSubject.send(())
         }))
         button.contentHorizontalAlignment = .center
         button.setTitle("Test Presenting", for: .normal)
@@ -59,7 +71,7 @@ final class SettingsViewController: BaseViewController {
     
     private lazy var pushButton: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
-            self.pushSubject.send(())
+            self.viewModel.pushSubject.send(())
         }))
         button.contentHorizontalAlignment = .center
         button.setTitle("Test Pushing", for: .normal)

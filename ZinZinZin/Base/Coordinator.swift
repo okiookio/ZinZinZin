@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-public protocol Coordinator: class, RoutableProtocol {
+public protocol Coordinator: AnyObject, RoutableProtocol {
     
     associatedtype CoordinationResult
     
@@ -24,8 +24,15 @@ open class BaseCoordinator<Result>: NSObject, Coordinator {
     
     public let identifier = UUID()
     
-    private var childCoordinators = [UUID: Any]()
+    private var childCoordinators = [UUID: Any]() {
+        didSet {
+            print(Self.self, #function, childCoordinators)
+        }
+    }
     
+    deinit {
+        print(Self.self, #function, identifier)
+    }
     public var bag = Set<AnyCancellable>()
     
     public let router: Router

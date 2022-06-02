@@ -34,7 +34,7 @@ final class AppCoordinator: BaseCoordinator<Void> {
     }
     
     private func startTab() {
-        let coordinator = TabCoordinator(presenting: NavigationController(), tabs: Tab.allCases)
+        let coordinator = TabCoordinator(presenting: NavigationController(), tabs: [.covert,.waking])
         setRoot(to: coordinator, into: window)
             .sink { [unowned self] _ in
                 self.startSplash()

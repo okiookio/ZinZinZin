@@ -13,8 +13,11 @@ final class LizardCoordinator: BaseCoordinator<Void> {
     
     private let tab: Tab
     
+    lazy var viewModel: LizardViewController.ViewModel = {
+        return .init()
+    }()
     lazy var viewController = {
-        return LizardViewController(tab: tab)
+        return LizardViewController(tab: tab, viewModel: viewModel)
     }()
     
     override var source: UIViewController  {
@@ -38,7 +41,7 @@ final class LizardCoordinator: BaseCoordinator<Void> {
     
     override func start() -> AnyPublisher<Void, Never> {
         
-        viewController.composeSubject
+        viewModel.composeSubject
             .map { [unowned self] _ in self.tab }
             .flatMap { [unowned self] tab in
                 self.startCompose(tab: tab)

@@ -10,16 +10,22 @@ import Combine
 
 final class WakingUpViewController: BaseViewController {
     
-    let openUrlSubject = PassthroughSubject<URL, Never>()
+    class ViewModel {
+        let openUrlSubject = PassthroughSubject<URL, Never>()
+        
+        let settingsSubject = PassthroughSubject<Bool, Never>()
+        deinit {
+            print(Self.self, #function)
+        }
+    }
     
-    let settingsSubject = PassthroughSubject<Bool, Never>()
     
-    private var bag = Set<AnyCancellable>()
-    
+    private var viewModel: ViewModel!
     private let tab: Tab
     
-    public init(tab: Tab) {
+    public init(tab: Tab, viewModel: ViewModel) {
         self.tab = tab
+        self.viewModel = viewModel
         super.init()
     }
     
@@ -50,7 +56,7 @@ final class WakingUpViewController: BaseViewController {
     private lazy var button: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
             if let url = URL(string: "https://wakingup.com/") {
-                self.openUrlSubject.send(url)
+                self.viewModel.openUrlSubject.send(url)
             }
         }))
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .bold)
@@ -61,7 +67,7 @@ final class WakingUpViewController: BaseViewController {
     private lazy var settingsButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Settings",
                                      image: nil, primaryAction: UIAction(handler: { [unowned self] _ in
-                                        self.settingsSubject.send(true)
+            self.viewModel.settingsSubject.send(true)
                                      }))
         
         return button

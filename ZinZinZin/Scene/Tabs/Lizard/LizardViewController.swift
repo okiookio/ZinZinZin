@@ -10,7 +10,16 @@ import Combine
 
 final class LizardViewController: BaseViewController {
     
-    let composeSubject = PassthroughSubject<Bool, Never>()
+    class ViewModel {
+        let composeSubject = PassthroughSubject<Bool, Never>()
+        deinit {
+            print(Self.self, #function)
+        }
+    }
+    
+    private var viewModel: ViewModel!
+    
+    
     
     var numberOfItems = 0 {
         didSet {
@@ -21,13 +30,12 @@ final class LizardViewController: BaseViewController {
             button.setTitle("Created \(numberOfItems) Lizard\(numberOfItems > 1 ? "s": "")", for: .normal)
         }
     }
-    
-    private var bag = Set<AnyCancellable>()
-    
+        
     private let tab: Tab
     
-    public init(tab: Tab) {
+    public init(tab: Tab, viewModel: ViewModel) {
         self.tab = tab
+        self.viewModel = viewModel
         super.init()
     }
     
@@ -57,7 +65,7 @@ final class LizardViewController: BaseViewController {
     
     private lazy var button: UIButton = {
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { [unowned self] _ in
-            self.composeSubject.send(true)
+            self.viewModel.composeSubject.send(true)
         }))
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         button.setTitle("Create Lizards?", for: .normal)

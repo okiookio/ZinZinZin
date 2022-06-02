@@ -10,8 +10,11 @@ import Combine
 
 final class SplashCoordinator: BaseCoordinator<Void> {
     
+    lazy var viewModel: SplashViewController.ViewModel = {
+        return .init()
+    }()
     lazy var viewController = {
-        return SplashViewController()
+        return SplashViewController(viewModel: viewModel)
     }()
     
     override var source: UIViewController  {
@@ -20,7 +23,7 @@ final class SplashCoordinator: BaseCoordinator<Void> {
     }
     
     override func start() -> AnyPublisher<Void, Never> {
-        return viewController.completedSubject
+        return viewModel.completedSubject
             .map { _ in () }
             .eraseToAnyPublisher()
     }
